@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mineos
+  labels:
+    app: mineos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mineos
+  template:
+    metadata:
+      labels:
+        app: mineos
+    spec:
+      volumes:
+      - name: mineos-data
+        persistentVolumeClaim:
+          claimName: mineos-data
+      initContainers:
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 1000:1000 /nexus"]
+        volumeMounts:
+        - name: mineos-data
+          mountPath: /nexus
+      containers:
+      - name: sftp
+        image: atmoz/sftp
+        args: ["mc:ODAxMDcwMjA1M2ZhNmQz:1000"]
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            memory: 100Mi
+        ports:
+          - containerPort: 22
+            name: sftp
+        volumeMounts:
+          - name: mineos-data
+            mountPath: /home/mc/upload
+      - name: mineos
+        image: cyberpunkyc/mineos:latest
+        resources:
+          limits:
+            memory: 4096Mi
+          requests:
+            memory: 2048Mi
+        env:
+          - name: USE_HTTPS
+            value: "false"
+          - name: SERVER_PORT
+            value: "80"
+          - name: USER_NAME
+            value: mc
+          - name: USER_UID
+            value: "1000"
+          - name: USER_PASSWORD
+            value: ODAxMDcwMjA1M2ZhNmQz
+        ports:
+          - containerPort: 80
+            name: http
+          - containerPort: 25565
+            name: minecraft
+        volumeMounts:
+          - name: mineos-data
+            mountPath: /var/games/minecraft

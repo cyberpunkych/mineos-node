@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mineos-service
+  labels:
+    app: mineos
+  annotations:
+    loadbalancer.openstack.org/keep-floatingip: "true"
+    # loadbalancer.openstack.org/proxy-protocol: "true"
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+    - name: minecraft
+      protocol: TCP
+      port: 25565
+    - name: sftp
+      protocol: TCP
+      port: 22
+  selector:
+    app: mineos
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mineos-ingress
+  labels:
+    app: mineos
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: victorpro.mad.pub
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: mineos-service
+            port:
+              number: 80
