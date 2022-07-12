@@ -5,6 +5,8 @@ metadata:
   labels:
     app: mineos
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
@@ -31,9 +33,9 @@ spec:
         args: ["mc:ODAxMDcwMjA1M2ZhNmQz:1000"]
         resources:
           limits:
-            memory: 200Mi
-          requests:
             memory: 100Mi
+          requests:
+            memory: 50Mi
         ports:
           - containerPort: 22
             name: sftp
@@ -44,9 +46,9 @@ spec:
         image: cyberpunkyc/mineos:latest
         resources:
           limits:
-            memory: 4096Mi
+            memory: 2Gi
           requests:
-            memory: 2048Mi
+            memory: 1536Mi
         env:
           - name: USE_HTTPS
             value: "false"

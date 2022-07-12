@@ -15,6 +15,12 @@ spec:
     - name: minecraft
       protocol: TCP
       port: 25565
+    - name: minecraft2
+      protocol: TCP
+      port: 25570
+    - name: minecraft3
+      protocol: TCP
+      port: 19176
     - name: sftp
       protocol: TCP
       port: 22
